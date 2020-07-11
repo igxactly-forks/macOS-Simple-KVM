@@ -6,17 +6,18 @@ OVMF=$VMDIR/firmware
 #export QEMU_AUDIO_DRV=pa
 #QEMU_AUDIO_DRV=pa
 
+
 qemu-system-x86_64 \
     -enable-kvm \
-    -m 2G \
+    -m 6G \
     -machine q35,accel=kvm \
-    -smp 4,cores=2 \
+    -smp cores=4,threads=1,sockets=2 \
     -cpu Penryn,vendor=GenuineIntel,kvm=on,+sse3,+sse4.2,+aes,+xsave,+avx,+xsaveopt,+xsavec,+xgetbv1,+avx2,+bmi2,+smep,+bmi1,+fma,+movbe,+invtsc \
     -device isa-applesmc,osk="$OSK" \
     -smbios type=2 \
     -drive if=pflash,format=raw,readonly,file="$OVMF/OVMF_CODE.fd" \
     -drive if=pflash,format=raw,file="$OVMF/OVMF_VARS-1024x768.fd" \
-    -vga qxl \
+    -device qxl-vga,ram_size=67108864,vram_size=67108864,vgamem_mb=64 \
     -device ich9-intel-hda -device hda-output \
     -usb -device usb-kbd -device usb-mouse \
     -netdev user,id=net0 \
@@ -26,3 +27,5 @@ qemu-system-x86_64 \
     -device ide-hd,bus=sata.2,drive=ESP \
     -drive id=InstallMedia,format=raw,if=none,file=BaseSystem.img \
     -device ide-hd,bus=sata.3,drive=InstallMedia \
+    -drive id=SystemDisk,if=none,file=MyDisk.qcow2 \
+    -device ide-hd,bus=sata.4,drive=SystemDisk \
